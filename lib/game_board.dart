@@ -55,31 +55,36 @@ class _GameBoardState extends State<GameBoard> {
       backgroundColor: Colors.black,
       body: Column(
         children: [
-          Expanded(
-            child: GridView.builder(
-                itemCount: rowLength * colLength,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: rowLength),
-                itemBuilder: (context, index) {
-                  int row = (index / rowLength).floor();
-                  int col = index % rowLength;
+          SizedBox(
+            height: 800,
+            width: 500,
+            child: Expanded(
+              flex: 8,
+              child: GridView.builder(
+                  itemCount: rowLength * colLength,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: rowLength, mainAxisExtent: 40),
+                  itemBuilder: (context, index) {
+                    int row = (index / rowLength).floor();
+                    int col = index % rowLength;
 
-                  if (currentPiece.position.contains(index)) {
-                    return Pixel(
-                      color: currentPiece.color,
-                    );
-                  } else if (gameBoard[row][col] != null) {
-                    final Tetromino? tetrominoType = gameBoard[row][col];
-                    return Pixel(
-                      color: tetrominoColors[tetrominoType],
-                    );
-                  } else {
-                    return Pixel(
-                      color: Colors.grey[900],
-                    );
-                  }
-                }),
+                    if (currentPiece.position.contains(index)) {
+                      return Pixel(
+                        color: currentPiece.color,
+                      );
+                    } else if (gameBoard[row][col] != null) {
+                      final Tetromino? tetrominoType = gameBoard[row][col];
+                      return Pixel(
+                        color: tetrominoColors[tetrominoType],
+                      );
+                    } else {
+                      return Pixel(
+                        color: Colors.grey[900],
+                      );
+                    }
+                  }),
+            ),
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 5),

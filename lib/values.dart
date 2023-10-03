@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 int rowLength = 10;
-int colLength = 15;
+int colLength = 20;
 
 enum Direction {
   left,

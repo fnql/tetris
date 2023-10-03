@@ -25,7 +25,6 @@ const Map<Tetromino, Color> tetrominoColors = {
   Tetromino.I: Color.fromARGB(255, 242, 0, 255), // Pink
   Tetromino.O: Color(0xFFFFFF00), // Yellow
   Tetromino.S: Color(0xFF008000), // Green
-  //red error
   Tetromino.Z: Color(0xFFFF0000), // Red
   Tetromino.T: Color.fromARGB(255, 144, 0, 255), // Purple
 };

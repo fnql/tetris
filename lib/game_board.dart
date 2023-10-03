@@ -18,12 +18,35 @@ class GameBoard extends StatefulWidget {
 
 class _GameBoardState extends State<GameBoard> {
   Piece currentPiece = Piece(type: Tetromino.L);
+  int currentScore = 0;
+  bool gameOver = false;
 
   @override
   void initState() {
     super.initState();
 
     startGame();
+  }
+
+  void clearLines() {
+    for (int row = colLength - 1; row >= 0; row--) {
+      bool rowIsFull = true;
+
+      for (int col = 0; col < rowLength; col++) {
+        if (gameBoard[row][col] == null) {
+          rowIsFull = false;
+          break;
+        }
+      }
+      if (rowIsFull) {
+        for (int r = row; r > 0; r--) {
+          gameBoard[r] = List.from(gameBoard[r - 1]);
+        }
+
+        gameBoard[0] = List.generate(row, (index) => null);
+        currentScore++;
+      }
+    }
   }
 
   @override
@@ -45,22 +68,28 @@ class _GameBoardState extends State<GameBoard> {
                   if (currentPiece.position.contains(index)) {
                     return Pixel(
                       color: currentPiece.color,
-                      child: index.toString(),
                     );
                   } else if (gameBoard[row][col] != null) {
                     final Tetromino? tetrominoType = gameBoard[row][col];
                     return Pixel(
-                        color: tetrominoColors[tetrominoType], child: " ");
+                      color: tetrominoColors[tetrominoType],
+                    );
                   } else {
                     return Pixel(
                       color: Colors.grey[900],
-                      child: index.toString(),
                     );
                   }
                 }),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 0),
+            padding: EdgeInsets.only(bottom: 5),
+            child: Text(
+              "Score: $currentScore",
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -75,6 +104,10 @@ class _GameBoardState extends State<GameBoard> {
                 IconButton(
                     onPressed: moveRight,
                     icon: Icon(Icons.arrow_forward_ios),
+                    color: Colors.white),
+                IconButton(
+                    onPressed: moveDown,
+                    icon: const Icon(Icons.arrow_downward),
                     color: Colors.white),
               ],
             ),
@@ -94,7 +127,13 @@ class _GameBoardState extends State<GameBoard> {
   void gameLoop(Duration frameRate) {
     Timer.periodic(frameRate, (timer) {
       setState(() {
+        clearLines();
         checkLanding();
+
+        if (gameOver) {
+          timer.cancel();
+          showGameOverDialog();
+        }
 
         currentPiece.movePiece(Direction.down);
       });
@@ -114,7 +153,7 @@ class _GameBoardState extends State<GameBoard> {
         row += 1;
       }
 
-      if (row >= colLength || col < 0 || col >= rowLength) {
+      if ((row >= colLength || col < 0 || col >= rowLength)) {
         return true;
       }
     }
@@ -177,10 +216,13 @@ class _GameBoardState extends State<GameBoard> {
       type: randomType,
     );
     currentPiece.initializePiece();
+
+    if (isGameOver()) {
+      gameOver = true;
+    }
   }
 
   void moveLeft() {
-    print(checkLanded());
     if (!checkCollision(Direction.left)) {
       setState(() {
         currentPiece.movePiece(Direction.left);
@@ -196,9 +238,51 @@ class _GameBoardState extends State<GameBoard> {
     }
   }
 
+  void moveDown() {
+    if (!checkCollision(Direction.down)) {
+      setState(() {
+        currentPiece.movePiece(Direction.down);
+      });
+    }
+  }
+
   void rotatePiece() {
     setState(() {
       currentPiece.rotatePiece();
     });
+  }
+
+  bool isGameOver() {
+    for (int col = 0; col < rowLength; col++) {
+      if (gameBoard[0][col] != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void showGameOverDialog() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("Game Over"),
+              content: Text("Your score is: $currentScore"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      resetGame();
+                      Navigator.pop(context);
+                    },
+                    child: Text("다시하기"))
+              ],
+            ));
+  }
+
+  void resetGame() {
+    gameBoard = List.generate(
+        colLength, (index) => List.generate(rowLength, (j) => null));
+    gameOver = false;
+    currentScore = 0;
+    startGame();
   }
 }

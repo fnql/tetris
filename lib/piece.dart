@@ -294,7 +294,7 @@ class Piece {
         switch (rotationState) {
           case 0:
             newPosition = [
-              position[0] + rowLength - 1,
+              position[0] + rowLength - 2,
               position[1],
               position[2] + rowLength - 1,
               position[3] + 1,
@@ -330,9 +330,9 @@ class Piece {
             break;
           case 3:
             newPosition = [
-              position[0] + rowLength + 2,
+              position[0] - rowLength + 2,
               position[1],
-              position[2] + rowLength + 1,
+              position[2] - rowLength + 1,
               position[3] - 1,
             ];
             if (piecePositionIsValid(newPosition)) {
